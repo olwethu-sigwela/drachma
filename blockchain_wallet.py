@@ -18,6 +18,7 @@ class Wallet:
         self.pending = 0    # (can be positive or negative) an amount that is still wating to be confirmed in the form of a block on the blockchain (transaction that generated this balance still needs to be added to the chain)
         self.total = self.available + self.pending  #total balance
         self.nodes = set() #Set of nodes that can validate transactions
+        self.port = -1
     
     def send(self, amount, address):
         #Creates a transaction that sends currency to a specific address.
@@ -60,15 +61,31 @@ def register():
         password = sha256(values.get("password").encode()).hexdigest() #TODO: Encrypt this password
     else:
         password = values.get("password")
+    
+    port_file = open("port_counter.txt", "r")
+    port_data = int(port_file.read())
+    print(f"{port_data=}")
+
+   
+    new_port = port_data + 2
+    port_file = open("port_counter.txt", "w")
+    port_file.write(str(new_port))
+    port_file.close()
+
+
+
+
 
     wallet_info = {
         "username": username,
+        "port": port_data,
         "password": password,
         "address": str(uuid4()).replace('-', ''),
         "available balance": 0,
         "pending balance": 0,
         "total balance": 0,
         "nodes": []
+
 
 
     }
@@ -80,7 +97,7 @@ def register():
     if wallet_info['username'] in wallet_dict:
         return "Error: A wallet with this username already exists", 400
     
-    wallet_dict[wallet_info['username']] = {"address": wallet_info['address'], "password": wallet_info['password'], "available balance": wallet_info["pending balance"], "pending balance": wallet_info["total balance"], "total balance": wallet_info["total balance"], "nodes": wallet_info["nodes"]}
+    wallet_dict[wallet_info['username']] = {"address": wallet_info['address'], "password": wallet_info['password'], "available balance": wallet_info["pending balance"], "pending balance": wallet_info["total balance"], "total balance": wallet_info["total balance"], "nodes": wallet_info["nodes"], "port": wallet_info["port"]}
     wallet_json = json.dumps(wallet_dict) #TODO: encrypt password (it's currently stored as plaintext)
 
 
@@ -214,7 +231,8 @@ def login_offline():
   
     username = input("username: ")
     password = sha256(input("password: ").encode()).hexdigest()
-   
+    
+
 
     wallet_dict = json.load(open("wallets.json", "r"))
     
@@ -229,22 +247,23 @@ def login_offline():
         return -1
 
     wallet.username = username
+    wallet.port = wallet_dict[username]["port"]
     wallet.address = wallet_dict[username]["address"]
     wallet.available = wallet_dict[username]["available balance"]
     wallet.pending = wallet_dict[username]["pending balance"]
     wallet.total = wallet_dict[username]["total balance"]
     wallet.nodes = set(wallet_dict[username]["nodes"])
 
-    response = {"message": "Login successful",
-                "details": {
-                    "address": wallet_dict[username]["address"],
-                    "available balance" : wallet_dict[username]["available balance"],
-                    "pending balance" : wallet_dict[username]["pending balance"],
-                    "total balance" : wallet_dict[username]["total balance"]
-                }}
+    print("Login successful")
+    print("      details:" )
+    print(f"         address: {wallet_dict[username]["address"]}")
+    print(f"         available balance : {wallet_dict[username]["available balance"]}")
+    print(f"         pending balance : {wallet_dict[username]["pending balance"]}")
+    print(f"         total balance : {wallet_dict[username]["total balance"]}")
+                
     
 
-    return jsonify(response), 200
+    return wallet.port
 
 
 
