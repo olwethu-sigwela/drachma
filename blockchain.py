@@ -495,7 +495,7 @@ def main():
 
     port = login_offline() #int(input("Blockchain Node - Select port (5000/5001): "))
     if port != -1:
-        p1 = Process(target = blockchain_wallet.main, kwargs = {"port" : port + 1})
+        p1 = Process(target = blockchain_wallet.main, kwargs = {"port" : port + 1, "subprocess" : True})
 
         blockchain.wallet_address = "http://localhost:" + str(port + 1) #all transactions to and from this node will use this wallet port
 

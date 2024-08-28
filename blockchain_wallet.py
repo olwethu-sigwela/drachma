@@ -62,10 +62,12 @@ def register():
     else:
         password = values.get("password")
     
+
+
+    
     port_file = open("port_counter.txt", "r")
     port_data = int(port_file.read())
-    print(f"{port_data=}")
-
+    
    
     new_port = port_data + 2
     port_file = open("port_counter.txt", "w")
@@ -273,8 +275,13 @@ def login_offline():
 
 
 
-def main(port = 5000):
-    app.run(host="0.0.0.0", port=port)
+def main(port = 5000, subprocess = False):
+    if subprocess:
+        app.run(host="0.0.0.0", port=port)
+    else:
+        port = login_offline()
+        if port != -1:
+            app.run(host="0.0.0.0", port=port)
 
 if __name__ == "__main__":
     main()
