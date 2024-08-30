@@ -355,7 +355,8 @@ def register_account():
         "password":password,
         "password_encrypted": "True",
         "address":str(uuid4()).replace("-", ""),
-        "connected wallets":""
+        "connected wallets":"",
+        "chain":[]
         
     }
     
@@ -402,7 +403,7 @@ def register_account():
         
 
 
-    node_dict[node_info["username"]] = {"address":node_info["address"], "password":node_info["password"], "connected wallets": node_info["connected wallets"], "port": port_data}
+    node_dict[node_info["username"]] = {"address":node_info["address"], "password":node_info["password"], "connected wallets": node_info["connected wallets"], "port": port_data, "chain": node_info["chain"]}
     node_json = json.dumps(node_dict)
 
     node_file = open("nodes.json", "w")
