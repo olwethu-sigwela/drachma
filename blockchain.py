@@ -41,10 +41,31 @@ class BlockChain:
         #code for consensus with other nodes
         self.nodes = set()
 
+        self.username = ""
         self.wallet_address = ""
         self.port = -1
 
+    def save_chain(self):
+        nodes_dict = json.load(open("nodes.json", "r"))
+
+        nodes_dict[self.username]["chain"] = self.chain
+
+        nodes_json = json.dumps(nodes_dict)
+
+        nodes_file = open("nodes.json", "w")
+
+        nodes_file.write(nodes_json)
+
+        nodes_file.close()
+
+
+   
+
+
+
+
     def register_node(self,address):
+
         """
         Add a new node to the list of nodes
         :param address: <str> Address of node. Eg. 'http://192.168.0.5:5000'
@@ -56,6 +77,7 @@ class BlockChain:
         
 
     def valid_chain(self, chain):
+
         """
         Determine if a given blockchain is valid
         :param chain: <list> A blockchain
@@ -90,6 +112,7 @@ class BlockChain:
         return True
     
     def resolve_conflicts(self):
+
         """
         This is our Consensus Algorithm, it resolves conflicts
         by replacing our chain with the longest one in the network.
@@ -171,7 +194,9 @@ class BlockChain:
 
     
     def new_block(self, proof, previous_hash=None):
+
         #New block created and appended to the blockchain
+        
         block = {
             'index': len(self.chain) + 1,
             'timestamp': time(),
@@ -190,7 +215,9 @@ class BlockChain:
 
 
     def new_transaction(self, sender, recipient, amount):
+
         #Appends a new transaction to the transaction list
+        
         """
         Creates a new transaction to go into the next mined Block
         :param sender: <str> Address of the Sender
@@ -209,7 +236,9 @@ class BlockChain:
 
     @staticmethod
     def hash(block):
+         
         #Creates a hash from a block
+        
          """
         Creates a SHA-256 hash of a Block
         :param block: <dict> Block
@@ -323,6 +352,18 @@ def register_nodes():
 
     return jsonify(response), 201
 
+@app.route('/save_chain', methods=['GET'])
+def save_chain():
+    blockchain.save_chain()
+
+    response = {
+        "message": "Chain saved",
+        "chain": blockchain.chain
+                }
+    
+    return jsonify(response), 200
+
+
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
 
@@ -417,6 +458,21 @@ def register_account():
 
     return jsonify(response), 201
 
+
+@app.route("/propagate", methods = ["GET"])
+def propagate():
+
+    values = request.url.split("?")[1].split("&")
+    
+    
+
+    
+    # for address in blockchain.nodes:
+    #     pass
+
+
+
+
 @app.route("/nodes/login", methods = ["GET"])
 def login():
 
@@ -437,6 +493,7 @@ def login():
         return "Error: Incorrect username or password", 400
     
     blockchain.address = node_dict[username]["address"]
+    blockchain.username = username
     blockchain.port = node_dict[username]["port"]
     print(f"{blockchain.port=}")
     
@@ -478,6 +535,7 @@ def login_offline():
         return -1
        
     blockchain.address = node_dict[username]["address"]
+    blockchain.username = username
     blockchain.port = node_dict[username]["port"]
     print(f"{blockchain.port=}")
 
