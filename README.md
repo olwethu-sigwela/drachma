@@ -1,4 +1,4 @@
-#Drachma
+## Drachma
 
 Fully functional cryptocurrency built with Flask and IndexedDatabase
 
